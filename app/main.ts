@@ -1,4 +1,4 @@
-import {app, BrowserWindow, screen} from 'electron';
+import {app,ipcMain, BrowserWindow,nativeTheme, screen} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -22,6 +22,19 @@ function createWindow(): BrowserWindow {
       contextIsolation: false,  // false if you want to run e2e test with Spectron
     },
   });
+
+  ipcMain.handle('dark-mode:toggle', () => {
+    if (nativeTheme.shouldUseDarkColors) {
+      nativeTheme.themeSource = 'light'
+    } else {
+      nativeTheme.themeSource = 'dark'
+    }
+    return nativeTheme.shouldUseDarkColors
+  })
+
+  ipcMain.handle('dark-mode:system', () => {
+    nativeTheme.themeSource = 'system'
+  })
 
   if (serve) {
     const debug = require('electron-debug');

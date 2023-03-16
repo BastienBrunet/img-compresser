@@ -1,7 +1,13 @@
+<div class="container-dark-mode">
+  <div class="dark-mode">
+    <mat-slide-toggle [(ngModel)]="isChecked" (click)="toggleDarkMode()"></mat-slide-toggle>
+    <br/>
+    <button (click)="resetDarkMode()" mat-raised-button color="primary"> Reset</button>
+  </div>
+</div>
+
 <div class="container">
   <h1 class="title">
     {{ 'PAGES.HOME.TITLE' | translate }}
   </h1>
-
-  <a routerLink="/detail">{{ 'PAGES.HOME.GO_TO_DETAIL' | translate }}</a>
 </div>
