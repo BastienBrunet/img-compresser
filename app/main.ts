@@ -42,6 +42,7 @@ function createWindow(): BrowserWindow {
 
     require('electron-reloader')(module);
     win.loadURL('http://localhost:4200');
+    win.maximize();
   } else {
     // Path when running electron executable
     let pathIndex = './index.html';
@@ -53,6 +54,7 @@ function createWindow(): BrowserWindow {
 
     const url = new URL(path.join('file:', __dirname, pathIndex));
     win.loadURL(url.href);
+    win.maximize();
   }
 
   // Emitted when the window is closed.
