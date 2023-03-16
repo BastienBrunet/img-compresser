@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ElectronService } from '../core/services';
 
 @Component({
   selector: 'app-home',
@@ -8,10 +9,26 @@ import { Router } from '@angular/router';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(private router: Router) { }
+  isChecked: boolean;
 
-  ngOnInit(): void {
+  constructor(private router: Router, private electronService: ElectronService) { }
+
+  async ngOnInit() {
     console.log('HomeComponent INIT');
+  }
+
+  async toggleDarkMode() {
+    await this.electronService.toggleDarkMode();
+  }
+
+  async resetDarkMode() {
+    await this.electronService.resetDarkMode();
+    this.isChecked=false;
+  }
+
+  startProgress() {
+    // ProgressBar native
+    this.electronService.progressBar();
   }
 
 }

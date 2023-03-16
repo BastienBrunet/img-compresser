@@ -1,3 +1,9 @@
-:host {
-  
+.container-dark-mode {
+    float: right;
+}
+.dark-mode {
+    display : flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
