@@ -1,12 +1,14 @@
-import {app,ipcMain, BrowserWindow,nativeTheme, screen} from 'electron';
+import {app,ipcMain, BrowserWindow,nativeTheme, screen, Notification} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import ProgressBar from 'electron-progressbar';
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
-  const ProgressBar = require('electron-progressbar');
+serve = args.some(val => val === '--serve');
+const ProgressBar = require('electron-progressbar');
+const NOTIFICATION_TITLE = 'Images compressées !'
+const NOTIFICATION_BODY = "Aller c'est bon tout est compressé :)"
 
 function createWindow(): BrowserWindow {
 
@@ -124,7 +126,9 @@ app.on('activate', () => {
     // the start and the end of a task
     setTimeout(function() {
       progressBar.setCompleted();
-    }, 5000);
+      //Notification
+      new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
+    }, 5000);  
   });
 
   if (serve) {
