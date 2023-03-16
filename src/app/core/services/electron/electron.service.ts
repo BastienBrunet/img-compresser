@@ -61,4 +61,8 @@ export class ElectronService {
   async resetDarkMode(): Promise<void> {
     await this.ipcRenderer.invoke('dark-mode:system');
   }
+
+  async progressBar(): Promise<void> {
+    await this.ipcRenderer.send('start-progress-bar');
+  }
 }
