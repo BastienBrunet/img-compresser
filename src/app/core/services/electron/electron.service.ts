@@ -58,4 +58,8 @@ export class ElectronService {
   async getFile(): Promise<FileDialogResult> {
     return await this.ipcRenderer.invoke('file-select');
   }
+
+  async compressFiles(files: string[]): Promise<void> {
+    return await this.ipcRenderer.invoke('compress-files', files);
+  }
 }

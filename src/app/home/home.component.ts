@@ -22,5 +22,15 @@ export class HomeComponent implements OnInit {
   async openDialog(): Promise<void> {
     // Get the selected file path
     const result = await this.electronService.getFile();
+
+    console.log(result);
+
+    if (!result.canceled){
+      console.log('Compress files ...');
+      // Process the images
+      await this.electronService.compressFiles(result.filePaths);
+
+      console.log('End');
+    }
   }
 }
