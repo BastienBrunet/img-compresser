@@ -1,4 +1,4 @@
-import {app, BrowserWindow, screen} from 'electron';
+import {app, BrowserWindow, screen, ipcMain, dialog, nativeTheme} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -49,6 +49,11 @@ function createWindow(): BrowserWindow {
     // when you should delete the corresponding element.
     win = null;
   });
+
+  ipcMain.handle('file-select', async () => {
+    // TODO : file type constraint
+    return await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] });
+  })
 
   return win;
 }

@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import {FileDialogResult} from "../../models/FileDialogResult";
 
 @Injectable({
   providedIn: 'root'
@@ -52,5 +53,9 @@ export class ElectronService {
 
   get isElectron(): boolean {
     return !!(window && window.process && window.process.type);
+  }
+
+  async getFile(): Promise<FileDialogResult> {
+    return await this.ipcRenderer.invoke('file-select');
   }
 }
