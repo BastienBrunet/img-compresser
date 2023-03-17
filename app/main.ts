@@ -1,4 +1,4 @@
-import {app, BrowserWindow, nativeTheme, screen, Notification, ipcMain, dialog, shell} from 'electron';
+import {app,ipcMain, BrowserWindow,nativeTheme, screen, Notification, Tray, Menu, nativeImage,dialog, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import ProgressBar from 'electron-progressbar';
@@ -11,6 +11,7 @@ import {CompressionService} from "./services/CompressionService";
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
 serve = args.some(val => val === '--serve');
+const trayIcon = nativeImage.createFromPath(path.join('src', 'assets', 'icon.png'))
 
 const compressionService = new CompressionService()
 
@@ -25,6 +26,7 @@ function createWindow(): BrowserWindow {
     y: 0,
     width: size.width,
     height: size.height,
+    icon : trayIcon,
     webPreferences: {
       nodeIntegration: true,
       allowRunningInsecureContent: (serve),
@@ -48,7 +50,7 @@ function createWindow(): BrowserWindow {
 
 
   //ProgressBar
-  const INCREMENT = 0.03
+  const INCREMENT = 0.02
   const INTERVAL_DELAY = 100 // ms
 
   let c = 0
@@ -67,8 +69,6 @@ function createWindow(): BrowserWindow {
       // clear progress interval
       clearInterval(progressInterval);
       win.setProgressBar(-1)
-      app.on('ready', () => createWindow);
-
     }
   }, INTERVAL_DELAY);
 
@@ -118,6 +118,13 @@ app.on('activate', () => {
     win = null;
   });
 
+  win.on('close', (event) => {
+    ipcMain.removeHandler("dark-mode:toggle")
+    ipcMain.removeHandler("dark-mode:system")
+    event.preventDefault()
+    win.hide()
+  })
+
   ipcMain.handle('file-select', async () => {
     return compressionService.openFileSelectionDialog();
   })
@@ -126,9 +133,46 @@ app.on('activate', () => {
     return await compressionService.compressFiles(inputFiles);
   });
 
-    return win;
-  }
+  let tray = null
 
+  app.whenReady().then(() => {
+    tray = new Tray(trayIcon)
+
+    const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Ouvrir l’application',
+      click: () => {
+        win.show()
+      }
+    },
+    {
+      label: 'Sélectionner des images',
+      click: () => {
+        // Code pour sélectionner des images
+      }
+    },
+    {
+      label: 'Fermer l’application',
+      click: () => {
+        app.quit()
+        win = null;
+        tray.destroy()
+        
+      }
+    }
+  ])
+  tray.setToolTip('Con-Prêt-Soeur')
+  tray.setContextMenu(contextMenu)
+
+  tray.on('click', () => {
+    // Code pour gérer un clic sur l'icône de la barre d'état
+    win.show()
+  })
+})
+
+  return win;
+
+}
 try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
