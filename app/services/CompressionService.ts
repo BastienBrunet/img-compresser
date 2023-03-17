@@ -97,7 +97,7 @@ export class CompressionService {
       if (conflictResult != 1) {
         treatedFiles.push(
           new Promise<string>(
-            resolve => execFile(pngquant, ['-o', destPath, file], error => {
+            resolve => execFile(pngquant.replace("app.asar","app.asar.unpacked"), ['-o', destPath, file], error => {
               resolve(error ? error.message : null);
             })
           ));

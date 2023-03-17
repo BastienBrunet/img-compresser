@@ -103,8 +103,7 @@ class CompressionService {
             }
             // If no conflict or replace file selected
             if (conflictResult != 1) {
-                fs_1.default.writeFileSync('mylog.txt', pngquant_bin_1.default);
-                treatedFiles.push(new Promise(resolve => (0, node_child_process_1.execFile)(pngquant_bin_1.default, ['-o', destPath, file], error => {
+                treatedFiles.push(new Promise(resolve => (0, node_child_process_1.execFile)(pngquant_bin_1.default.replace("app.asar", "app.asar.unpacked"), ['-o', destPath, file], error => {
                     resolve(error ? error.message : null);
                 })));
             }
