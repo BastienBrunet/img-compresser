@@ -53,8 +53,6 @@ class CompressionService {
             progressBar.setCompleted();
             // Handle errors
             yield this.handleProcessErrors(compressionErrors, directoryPath);
-            // Send a notification
-            new electron_1.Notification({ title: this.NOTIFICATION_TITLE, body: this.NOTIFICATION_BODY }).show();
         });
     }
     initProgressBar() {
@@ -82,6 +80,8 @@ class CompressionService {
             else {
                 // Open the output directory
                 yield electron_1.shell.openPath(directoryPath);
+                // Send a notification
+                new electron_1.Notification({ title: this.NOTIFICATION_TITLE, body: this.NOTIFICATION_BODY }).show();
             }
         });
     }
@@ -103,6 +103,7 @@ class CompressionService {
             }
             // If no conflict or replace file selected
             if (conflictResult != 1) {
+                fs_1.default.writeFileSync('mylog.txt', pngquant_bin_1.default);
                 treatedFiles.push(new Promise(resolve => (0, node_child_process_1.execFile)(pngquant_bin_1.default, ['-o', destPath, file], error => {
                     resolve(error ? error.message : null);
                 })));
