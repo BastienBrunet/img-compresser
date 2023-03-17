@@ -10,12 +10,6 @@
   <h1 class="title">
     {{ 'PAGES.HOME.TITLE' | translate }}
     <br/><br/>
-    <button (click)="startProgress()" mat-raised-button color="primary"> Lance progress bar</button>
+    <button (click)="openDialog()" mat-raised-button color="primary"> Selectionner des images </button>
   </h1>
-
-  <!-- Link to navigate to another page -->
-  <a routerLink="/detail">{{ 'PAGES.HOME.GO_TO_DETAIL' | translate }}</a>
-
-  <button (click)="openDialog()" >Select files</button>
-
 </div>

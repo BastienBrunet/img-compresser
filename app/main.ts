@@ -5,15 +5,15 @@ import ProgressBar from 'electron-progressbar';
 import { execFile } from 'node:child_process';
 import { access, constants, mkdir } from 'node:fs';
 import pngquant from 'pngquant-bin';
+import {CompressionService} from "./services/CompressionService";
 
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
 serve = args.some(val => val === '--serve');
-const NOTIFICATION_TITLE = 'Images compressées !'
-const NOTIFICATION_BODY = "Aller c'est bon tout est compressé :)"
-const ProgressBar = require('electron-progressbar');
 const trayIcon = nativeImage.createFromPath(path.join('src', 'assets', 'icon.png'))
+
+const compressionService = new CompressionService()
 
 function createWindow(): BrowserWindow {
 
@@ -89,52 +89,6 @@ app.on('activate', () => {
   }
 })
 
-  ipcMain.on('start-progress-bar', (event) => {
-
-    let value = 0;
-    const intervalId = setInterval(() => {
-      win.setProgressBar(value)
-      if (value < 1) {
-        value += INCREMENT
-      } else {
-        value = (-INCREMENT * 5) // reset to a bit less than 0 to show reset state
-      }
-      if (value >= 1) {
-        clearInterval(intervalId);
-        win.setProgressBar(-1)
-      }
-    }, 100);
-
-
-    // Other progressbar
-
-    var progressBar = new ProgressBar({
-      text: 'Preparing data...',
-      detail: 'Wait...'
-    });
-
-    progressBar
-      .on('completed', function() {
-        console.info(`completed...`);
-        progressBar.detail = 'Task completed. Exiting...';
-      })
-      .on('aborted', function() {
-        console.info(`aborted...`);
-      });
-
-    // launch a task...
-    // launchTask();
-
-    // when task is completed, set the progress bar to completed
-    // ps: setTimeout is used here just to simulate an interval between
-    // the start and the end of a task
-    setTimeout(function() {
-      progressBar.setCompleted();
-      //Notification
-      new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
-    }, 5000);
-  });
-
   if (serve) {
     const debug = require('electron-debug');
     debug();
@@ -172,77 +126,13 @@ app.on('activate', () => {
   })
 
   ipcMain.handle('file-select', async () => {
-    return await dialog.showOpenDialog(
-    { properties: ['openFile', 'multiSelections'], filters: [
-              { name: 'Images', extensions: ['png'] }] });
+    return compressionService.openFileSelectionDialog();
   })
 
   ipcMain.handle('compress-files', async (event, inputFiles: string[]) => {
+    return await compressionService.compressFiles(inputFiles);
+  });
 
-    const treatedFiles = [];
-    // Get temp directory path
-    const directoryPath = app.getPath("appData").concat("\\compressed-files\\");
-
-    // Create directory if not exists
-    const directoryCheck = new Promise<void>(resolve => access(directoryPath, constants.F_OK, (err) => {
-      if(err){
-        mkdir(directoryPath, { recursive: true }, (err) => {
-          if (err) throw err;
-          resolve()
-        });
-      } else {
-       resolve()
-      }
-    }));
-
-    // Wait for the check to complete
-    await directoryCheck;
-
-    // Compress all the files and put them in the directory
-    inputFiles.forEach(file => {
-      const destPath = directoryPath.concat(path.basename(file));
-      let conflictResult = null;
-      if (fs.existsSync(destPath)){
-        // If file already exists, open a dialog to ask what to do
-        conflictResult = dialog.showMessageBoxSync(
-          {
-            title: "Conflit",
-            message: "Le fichier " + destPath + " existe déjà, voulez vous le remplacer ?",
-            buttons: ['Remplacer', 'Ignorer']
-          }
-        );
-        // If the user wants to replace : delete the file
-        if (conflictResult == 0) {
-          fs.unlinkSync(destPath);
-        }
-      }
-      // If no conflict or replace file selected
-      if (conflictResult != 1){
-        treatedFiles.push(
-          new Promise<string>(
-            resolve => execFile(pngquant, ['-o', destPath, file ], error => {
-              resolve(error ? error.message : null);
-            })
-          ));
-      }
-    })
-
-    // Wait for all the files to be treated
-    const compressionErrors : string[] = await Promise.all(treatedFiles);
-
-    if (compressionErrors.filter(m => m != null).length > 0) {
-      // Concat
-      let messages = "";
-      compressionErrors.forEach(message => messages = messages.concat(message + "\n"));
-      dialog.showMessageBoxSync({message: messages, title: "Erreur"});
-    } else {
-      // Open the output directory
-      await shell.openPath(directoryPath);
-    }
-
-  })
-
-  // Menu
   let tray = null
 
   app.whenReady().then(() => {
@@ -257,8 +147,9 @@ app.on('activate', () => {
     },
     {
       label: 'Sélectionner des images',
-      click: () => {
-        // Code pour sélectionner des images
+      click: async () => {
+        const selectedFiles = await compressionService.openFileSelectionDialog();
+        await compressionService.compressFiles(selectedFiles.filePaths);
       }
     },
     {
@@ -267,7 +158,7 @@ app.on('activate', () => {
         app.quit()
         win = null;
         tray.destroy()
-        
+
       }
     }
   ])
@@ -281,8 +172,8 @@ app.on('activate', () => {
 })
 
   return win;
-}
 
+}
 try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
