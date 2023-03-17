@@ -43,9 +43,6 @@ export class CompressionService {
 
     // Handle errors
     await this.handleProcessErrors(compressionErrors, directoryPath);
-
-    // Send a notification
-    new Notification({ title: this.NOTIFICATION_TITLE, body: this.NOTIFICATION_BODY }).show()
   }
 
   private initProgressBar() {
@@ -73,6 +70,8 @@ export class CompressionService {
     } else {
       // Open the output directory
       await shell.openPath(directoryPath);
+      // Send a notification
+      new Notification({ title: this.NOTIFICATION_TITLE, body: this.NOTIFICATION_BODY }).show()
     }
   }
 
