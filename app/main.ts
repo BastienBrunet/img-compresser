@@ -1,8 +1,8 @@
-import {app, BrowserWindow, bativeTheme, screen, Notification, ipcMain, dialog, shell} from 'electron';
+import {app, BrowserWindow, nativeTheme, screen, Notification, ipcMain, dialog, shell} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import ProgressBar from 'electron-progressbar';
-import {execFile} from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { access, constants, mkdir } from 'node:fs';
 import pngquant from 'pngquant-bin';
 
@@ -10,7 +10,6 @@ import pngquant from 'pngquant-bin';
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
 serve = args.some(val => val === '--serve');
-const ProgressBar = require('electron-progressbar');
 const NOTIFICATION_TITLE = 'Images compressées !'
 const NOTIFICATION_BODY = "Aller c'est bon tout est compressé :)"
 
@@ -68,7 +67,7 @@ function createWindow(): BrowserWindow {
       clearInterval(progressInterval);
       win.setProgressBar(-1)
       app.on('ready', () => createWindow);
-      
+
     }
   }, INTERVAL_DELAY);
 
@@ -90,7 +89,7 @@ app.on('activate', () => {
 })
 
   ipcMain.on('start-progress-bar', (event) => {
-    
+
     let value = 0;
     const intervalId = setInterval(() => {
       win.setProgressBar(value)
@@ -112,7 +111,7 @@ app.on('activate', () => {
       text: 'Preparing data...',
       detail: 'Wait...'
     });
-    
+
     progressBar
       .on('completed', function() {
         console.info(`completed...`);
@@ -121,10 +120,10 @@ app.on('activate', () => {
       .on('aborted', function() {
         console.info(`aborted...`);
       });
-    
+
     // launch a task...
     // launchTask();
-    
+
     // when task is completed, set the progress bar to completed
     // ps: setTimeout is used here just to simulate an interval between
     // the start and the end of a task
@@ -132,7 +131,7 @@ app.on('activate', () => {
       progressBar.setCompleted();
       //Notification
       new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
-    }, 5000);  
+    }, 5000);
   });
 
   if (serve) {
