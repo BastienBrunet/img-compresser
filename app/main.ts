@@ -147,8 +147,9 @@ app.on('activate', () => {
     },
     {
       label: 'Sélectionner des images',
-      click: () => {
-        // Code pour sélectionner des images
+      click: async () => {
+        const selectedFiles = await compressionService.openFileSelectionDialog();
+        await compressionService.compressFiles(selectedFiles.filePaths);
       }
     },
     {
@@ -157,7 +158,7 @@ app.on('activate', () => {
         app.quit()
         win = null;
         tray.destroy()
-        
+
       }
     }
   ])
