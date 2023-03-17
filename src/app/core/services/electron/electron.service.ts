@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 import { ipcRenderer,contextBridge, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import {FileDialogResult} from "../../models/FileDialogResult";
+import {FileDialogResult} from '../../models/FileDialogResult';
 
 @Injectable({
   providedIn: 'root'
