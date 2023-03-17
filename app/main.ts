@@ -1,17 +1,13 @@
 import {app,ipcMain, BrowserWindow,nativeTheme, screen, Notification, Tray, Menu, nativeImage,dialog, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
-import ProgressBar from 'electron-progressbar';
-import { execFile } from 'node:child_process';
-import { access, constants, mkdir } from 'node:fs';
-import pngquant from 'pngquant-bin';
 import {CompressionService} from "./services/CompressionService";
 
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
 serve = args.some(val => val === '--serve');
-const trayIcon = nativeImage.createFromPath(path.join('src', 'assets', 'icon.png'))
+const trayIcon = nativeImage.createFromPath(path.join('icon.png'))
 
 const compressionService = new CompressionService()
 
@@ -104,6 +100,8 @@ app.on('activate', () => {
        // Path when running electron in local folder
       pathIndex = '../dist/index.html';
     }
+
+    console.log(pathIndex)
 
     const url = new URL(path.join('file:', __dirname, pathIndex));
     win.loadURL(url.href);
