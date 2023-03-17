@@ -41,9 +41,4 @@ export class HomeComponent implements OnInit {
     this.isChecked=false;
   }
 
-  startProgress() {
-    // ProgressBar native
-    this.electronService.progressBar();
-  }
-
 }

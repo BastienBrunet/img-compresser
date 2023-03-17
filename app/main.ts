@@ -88,52 +88,6 @@ app.on('activate', () => {
   }
 })
 
-  ipcMain.on('start-progress-bar', (event) => {
-
-    let value = 0;
-    const intervalId = setInterval(() => {
-      win.setProgressBar(value)
-      if (value < 1) {
-        value += INCREMENT
-      } else {
-        value = (-INCREMENT * 5) // reset to a bit less than 0 to show reset state
-      }
-      if (value >= 1) {
-        clearInterval(intervalId);
-        win.setProgressBar(-1)
-      }
-    }, 100);
-
-
-    // Other progressbar
-
-    var progressBar = new ProgressBar({
-      text: 'Preparing data...',
-      detail: 'Wait...'
-    });
-
-    progressBar
-      .on('completed', function() {
-        console.info(`completed...`);
-        progressBar.detail = 'Task completed. Exiting...';
-      })
-      .on('aborted', function() {
-        console.info(`aborted...`);
-      });
-
-    // launch a task...
-    // launchTask();
-
-    // when task is completed, set the progress bar to completed
-    // ps: setTimeout is used here just to simulate an interval between
-    // the start and the end of a task
-    setTimeout(function() {
-      progressBar.setCompleted();
-      //Notification
-      new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
-    }, 5000);
-  });
-
   if (serve) {
     const debug = require('electron-debug');
     debug();
@@ -171,6 +125,20 @@ app.on('activate', () => {
 
   ipcMain.handle('compress-files', async (event, inputFiles: string[]) => {
 
+    const progressBar = new ProgressBar({
+      text: 'Preparing data...',
+      detail: 'Wait...'
+    });
+
+    progressBar
+      .on('completed', function() {
+        progressBar.detail = 'Task completed. Exiting...';
+      })
+      .on('aborted', function() {
+        console.info(`aborted...`);
+      });
+
+    // All the promises of the files compression
     const treatedFiles = [];
     // Get temp directory path
     const directoryPath = app.getPath("appData").concat("\\compressed-files\\");
@@ -222,6 +190,8 @@ app.on('activate', () => {
     // Wait for all the files to be treated
     const compressionErrors : string[] = await Promise.all(treatedFiles);
 
+    progressBar.setCompleted();
+
     if (compressionErrors.filter(m => m != null).length > 0) {
       // Concat
       let messages = "";
@@ -232,10 +202,10 @@ app.on('activate', () => {
       await shell.openPath(directoryPath);
     }
 
-  })
+    new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()});
 
-  return win;
-}
+    return win;
+  }
 
 try {
   // This method will be called when Electron has finished

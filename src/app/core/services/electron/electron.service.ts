@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 
 // If you import a module but never use any of the imported values other than as TypeScript types,
 // the resulting javascript file will look as if you never imported the module at all.
-import { ipcRenderer,contextBridge, webFrame } from 'electron';
+import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import {FileDialogResult} from "../../models/FileDialogResult";
+import {FileDialogResult} from '../../models/FileDialogResult';
 
 @Injectable({
   providedIn: 'root'
@@ -61,10 +61,6 @@ export class ElectronService {
 
   async resetDarkMode(): Promise<void> {
     await this.ipcRenderer.invoke('dark-mode:system');
-  }
-
-  async progressBar(): Promise<void> {
-    await this.ipcRenderer.send('start-progress-bar');
   }
 
   async getFile(): Promise<FileDialogResult> {
